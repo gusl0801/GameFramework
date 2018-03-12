@@ -3,6 +3,10 @@
 #include "resource.h"
 #include "CBackBuffer.h"
 
+#define MS_PER_UPDATE 1 / 60.0f // 0.016f 일반적인 모니터는 1초에 60번 화면을 갱신
+#define MAX_LOOP_COUNT 50 // update따라잡기는 한번에 최대 50번 까지만 가능하도록 설정
+#define TITLE_LENGTH	50	// 타이틀 문자열의 길이를 최대 50자로 설정
+
 // 인스턴스를 초기화 해줍니다.
 SINGLETON_IMPL(CGameApp);
 
@@ -10,6 +14,12 @@ CGameApp::CGameApp()
 {
 	m_hInst = nullptr;
 	m_hWnd = nullptr;
+
+	LoadString(m_hInst, IDS_APP_TITLE, m_captionTitle, TITLE_LENGTH);
+
+	lstrcat(m_captionTitle, TEXT(" ("));
+	m_titleLength = lstrlen(m_captionTitle);
+	SetWindowText(m_hWnd, m_captionTitle);
 }
 
 CGameApp::~CGameApp()
@@ -122,11 +132,26 @@ BOOL CGameApp::InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 void CGameApp::FrameAdvance()
 {
-	ProcessInput(nullptr);
+	int loopCount = 0;
 
-	Update();
+	m_timer.Tick();
+
+	while (m_timer.GetTimeLag() > MS_PER_UPDATE && loopCount++ < MAX_LOOP_COUNT)
+	{
+		ProcessInput(nullptr);
+
+		Update();
+
+		m_timer.UpdateTimeLag(-MS_PER_UPDATE);
+	}
 
 	Draw();
+
+	float fps = m_timer.GetFrameRate();
+
+	_itow_s(fps, m_captionTitle + m_titleLength, TITLE_LENGTH - m_titleLength, 10);
+	wcscat_s(m_captionTitle + m_titleLength, TITLE_LENGTH - m_titleLength, TEXT(" FPS)"));
+	SetWindowText(m_hWnd, m_captionTitle);
 }
 
 void CGameApp::Update(float timeElpased)

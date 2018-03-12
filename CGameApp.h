@@ -1,12 +1,11 @@
 #pragma once
 
 /*
-작성자 : 임종현
 작성일 : 2018-03-09
 설명   : 윈도우를 생성하고 전체 프로그램을 관리하는 클래스입니다.
 */
-
 #include "Singleton.h"
+#include "CTimer.h"
 
 #define MAX_LOADSTRING 100
 
@@ -53,5 +52,9 @@ private:
 
 	RECT m_rtClientSize;
 	CBackBuffer *m_backBuffer;
+
+	CFPSTimer m_timer;
+	TCHAR m_captionTitle[50];	// FPS Caption 출력 관련 변수
+	int m_titleLength;			// FPS Caption 출력 관련 변수
 };
 

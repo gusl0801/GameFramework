@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+작성일 : 2018-03-11
+설명   : 더블버퍼링 처리를 위한 기능을 제공하는 클래스입니다.
+*/
 class CBackBuffer
 {
 public:
