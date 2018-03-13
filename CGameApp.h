@@ -6,11 +6,14 @@
 */
 #include "Singleton.h"
 #include "CTimer.h"
+#include "CScene.h"
 
 #define MAX_LOADSTRING 100
 
 class CInput;
 class CBackBuffer;
+
+using Viewport = RECT;
 
 class CGameApp : public Singleton<CGameApp>
 {
@@ -29,12 +32,16 @@ public:
 
 	void ShutDown();
 	
+	Viewport GetViewport() const { return m_viewport; }
+
+	void ChangeScene(CScene *scene) { if (scene == nullptr) return; m_currentScene = scene; }
+
 private:
 	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK ProcessWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	void Update(float timeElpased = UPDATE_FPS);
-	void Draw(float timeElpased = UPDATE_FPS);
+	void Update();
+	void Draw();
 	void ProcessInput(CInput *input);
 
 	void ReleaseObjects();
@@ -50,11 +57,13 @@ private:
 	WCHAR m_szTitle[MAX_LOADSTRING];       // 제목 표시줄 텍스트입니다.
 	WCHAR m_szWindowClass[MAX_LOADSTRING]; // 기본 창 클래스 이름입니다.
 
-	RECT m_rtClientSize;
+	Viewport m_viewport;
 	CBackBuffer *m_backBuffer;
 
 	CFPSTimer m_timer;
 	TCHAR m_captionTitle[50];	// FPS Caption 출력 관련 변수
 	int m_titleLength;			// FPS Caption 출력 관련 변수
+
+	CScene * m_currentScene;
 };
 

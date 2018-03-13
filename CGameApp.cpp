@@ -2,6 +2,8 @@
 #include "CGameApp.h"
 #include "resource.h"
 #include "CBackBuffer.h"
+#include "CTitleScene.h"
+#include "CNullScene.h"
 
 #define MS_PER_UPDATE 1 / 60.0f // 0.016f 일반적인 모니터는 1초에 60번 화면을 갱신
 #define MAX_LOOP_COUNT 50 // update따라잡기는 한번에 최대 50번 까지만 가능하도록 설정
@@ -12,6 +14,8 @@ SINGLETON_IMPL(CGameApp);
 
 CGameApp::CGameApp()
 {
+	m_currentScene = CScene::NewScene<CNullScene>();
+
 	m_hInst = nullptr;
 	m_hWnd = nullptr;
 
@@ -144,7 +148,6 @@ void CGameApp::FrameAdvance()
 
 		m_timer.UpdateTimeLag(-MS_PER_UPDATE);
 	}
-
 	Draw();
 
 	float fps = m_timer.GetFrameRate();
@@ -154,18 +157,18 @@ void CGameApp::FrameAdvance()
 	SetWindowText(m_hWnd, m_captionTitle);
 }
 
-void CGameApp::Update(float timeElpased)
+void CGameApp::Update()
 {
+	m_currentScene->Update();
 }
 
-void CGameApp::Draw(float timeElpased)
+void CGameApp::Draw()
 {
 	HDC backDC = m_backBuffer->GetBuffer();
-	GetClientRect(m_hWnd, &m_rtClientSize);
 
 	m_backBuffer->Reset();
 
-	TextOut(backDC, 50, 100, TEXT("확인"), lstrlen(TEXT("확인")));
+	m_currentScene->Draw(backDC);
 	
 	m_backBuffer->Present();
 }
@@ -199,9 +202,9 @@ LRESULT CGameApp::ProcessWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
-
+	
 	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
+		return m_currentScene->ProcessWndProc(hWnd, message, wParam, lParam);
 	}
 
 	return 0;
@@ -209,8 +212,10 @@ LRESULT CGameApp::ProcessWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
 void CGameApp::BuildObjects()
 {
-	GetClientRect(m_hWnd, &m_rtClientSize);
-	m_backBuffer = new CBackBuffer(m_hWnd, m_rtClientSize);
+ 	GetClientRect(m_hWnd, &m_viewport);
+	m_backBuffer = new CBackBuffer(m_hWnd, m_viewport);
+
+	m_currentScene = CScene::NewScene<CTitleScene>();
 }
 
 void CGameApp::ReleaseObjects()
