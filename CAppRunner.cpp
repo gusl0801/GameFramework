@@ -30,7 +30,7 @@ bool CAppRunner::Init(HINSTANCE hInst, int nCmdShow)
 	return true;
 }
 
-int CAppRunner::Run()
+int CAppRunner::BeginApp()
 {
 	MSG msg;
 

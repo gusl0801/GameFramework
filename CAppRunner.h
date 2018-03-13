@@ -14,7 +14,7 @@ public:
 	~CAppRunner();
 
 	bool Init(HINSTANCE hInst, int nCmdShow);
-	int Run();
+	int BeginApp();
 
 private:
 	CGameApp *m_app;
