@@ -18,7 +18,7 @@ public:
 		m_curTime = chrono::system_clock::now(); 
 		m_timeElapsed = m_curTime - m_prevTime;
 		m_prevTime = m_curTime;
-		m_timeLag = m_timeElapsed.count();
+		m_timeLag += m_timeElapsed.count();
 	}
 
 	// 이전 함수 호출 시간과 현재 함수 호출 시간 사이의 차이를 계산하여 반환합니다.
